@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Card Printer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <h1>Deck List</h1>
+        <button onclick="createDeck('J')">Create Deck (Japanese)</button>
+        <button onclick="createDeck('S')">Create Deck (Standard)</button>
+        <div id="deck-list"></div>
+    </div>
+
+    <div id="editor" style="display:none;">
+        <h1>Deck Editor</h1>
+        <div style="margin-bottom: 20px;">
+             <label for="deck-name-input">Name:</label>
+             <input type="text" id="deck-name-input" placeholder="Enter deck name..." oninput="updateDeckName(this.value)" style="padding: 5px; width: 250px;">
+        </div>
+        <button onclick="goBack()">Return</button>
+        <button onclick="saveDeck()">Save</button>
+        <button onclick="printPDF()">Print</button>
+        <br><br>
+        <input type="file" id="upload" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
+        <button class="btn-success" onclick="triggerUpload()">
+            Upload Images
+        </button>
+        <div id="card-grid" class="grid-container"></div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
