@@ -40,14 +40,34 @@ body {
     border: none;
     border-radius: 4px;
 }
-.deck-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Tiêu đề Gradient */
+.gradient-title {
+    background: linear-gradient(90deg,#007bff,#00ff88);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5em;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Lưới danh sách Deck */
+#deck-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 20px;
     padding: 10px;
-    border-bottom: 1px solid #eee;
-    background: #f9f9f9;
-    margin-bottom: 5px;
+}
+.deck-item {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .actions button {
     margin-left: 5px;
@@ -56,5 +76,106 @@ body {
 }
 .btn-success {
     background-color: #f9f9f9;
-    margin-bottom: 20px;
+    border: 2px solid #333 !important;
+}
+
+.deck-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+/* Tinh chỉnh nút bên trong thẻ Deck */
+.deck-item .actions {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.deck-item .actions button {
+    padding: 8px 5px;
+    font-size: 13px;
+    margin: 0;
+}
+/* Thanh công cụ cố định (Sticky) */
+.sticky-controls {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    border-bottom: 1px solid #ddd;
+}
+/* Định dạng nút*/
+.sticky-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px; /* Cố định chiều cao cho tất cả các nút */
+    min-width: 130px;
+    padding: 0 15px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    color: #333;
+    cursor: pointer;
+    box-sizing: border-box; /* Giúp padding không làm tăng kích thước nút */
+    transition: all 0.2s ease;
+    margin: 0; /* Đảm bảo không có margin lạ làm lệch nút */
+}
+/* Lưới hiển thị các lá bài trong Editor */
+.editor-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+    padding: 10px;
+}
+
+/* Từng lá bài trong Editor */
+.editor-grid .card-item {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.editor-grid .card-item:hover {
+    filter: brightness(0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.editor-grid .card-item img {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Căn chỉnh khu vực chỉnh số lượng */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.quantity-control input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

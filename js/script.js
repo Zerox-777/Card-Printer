@@ -1,6 +1,7 @@
 let db;
-let currentDeck={size:'J',cards:[],name:''};
 const {jsPDF}=window.jspdf;
+let isChanged=false;
+let currentDeck=null;
 
 // 1.KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB
 const request=indexedDB.open('CardMakerDB',1);
@@ -19,50 +20,106 @@ request.onsuccess=(e)=>{
 
 // 2.QUẢN LÝ TRANG CHỦ (DASHBOARD)
 function createDeck(size){
-    currentDeck={id:Date.now().toString(),size:size,cards:[],name:''};
+    // 1. Khởi tạo dữ liệu bộ bài mới
+    currentDeck={
+        id:Date.now().toString(),// Tạo ID duy nhất bằng thời gian
+        name:"",
+        size:size,// 'J' cho Japanese hoặc 'S' cho Standard
+        cards:[]
+    };
+    isChanged=false; // Đặt lại trạng thái chưa thay đổi khi tạo mới
     document.getElementById('dashboard').style.display='none';
     document.getElementById('editor').style.display='block';
-    document.getElementById('deck-name-input').value = "";
+    const nameInput=document.getElementById('deck-name-input');
+    if(nameInput){
+        nameInput.value="";
+        // Gán sự kiện input ngay khi tạo mới
+        nameInput.oninput=function(e){
+            currentDeck.name=e.target.value;
+            isChanged=true;
+        };
+    }
+    
+    const stats=document.getElementById('deck-stats');
+    if(stats) stats.innerText="Total Cards: 0";
+
+    // 5. Vẽ lưới trống
     renderGrid();
 }
 
 function goBack(){
-    const confirmBack=confirm("You have unsaved changes. Are you sure you want to exit?");
-    
-    if(confirmBack){
+    if(!currentDeck){
         document.getElementById('editor').style.display='none';
         document.getElementById('dashboard').style.display='block';
-        loadDeckList();
+        if(typeof loadDeckList==='function') loadDeckList();
+        return;
     }
+    if(isChanged){
+        const confirmExit=confirm("You have unsaved changes. Are you sure you want to leave?");
+        if(!confirmExit) return; // Nếu chọn Cancel thì ở lại
+    }
+    
+    // Nếu không có thay đổi hoặc người dùng đồng ý thoát
+    document.getElementById('editor').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    currentDeck=null;
+    isChanged=false;
+    if(typeof loadDeckList==='function') loadDeckList();
 }
 
 function loadDeckList(){
-    const listDiv=document.getElementById('deck-list');
-    listDiv.innerHTML="";
-    
     const store=db.transaction('decks','readonly').objectStore('decks');
-    store.openCursor().onsuccess=(e)=>{
-        const cursor=e.target.result;
-        if(cursor){
-            const deck=cursor.value;
-            const item=document.createElement('div');
-            item.className="deck-item";
+    const request=store.getAll();
+    
+    request.onsuccess=function(){
+        const decks=request.result;
+        const grid=document.getElementById('deck-list');
+        const emptyState=document.getElementById('empty-state');
+        
+        grid.innerHTML=''; // Xóa nội dung cũ
+        
+        if(decks.length===0){
+            // Nếu chưa có bài thì hiện trạng thái trống
+            emptyState.style.display='block';
+            grid.style.display='none';
+        }else{
+            // Nếu có bài thì ẩn trạng thái trống và hiện lưới
+            emptyState.style.display='none';
+            grid.style.display='grid';
             
-            const symbol=deck.size==='J'? 
-                '<span style="color:red;font-weight:bold">J</span>': 
-                '<span style="color:blue;font-weight:bold">S</span>';
-
-            item.innerHTML=`
-                ${symbol} <strong>${deck.name}</strong>
-                <div class="actions">
-                    <button onclick="copyDeck('${deck.id}')">Copy</button>
-                    <button onclick="editDeck('${deck.id}')">Edit</button>
-                    <button onclick="deleteDeck('${deck.id}')">Delete</button>
-                    <button onclick="printFromList('${deck.id}')">Print</button>
-                </div>
-            `;
-            listDiv.appendChild(item);
-            cursor.continue();
+            decks.forEach(deck=>{
+                const item=document.createElement('div');
+                item.className='deck-item';
+                
+                // Hiển thị loại bài cho chuyên nghiệp
+                const isJapanese=deck.size==='J'||deck.type==='J';
+                const symbol=deck.size==='J'?'Japanese':'Standard';
+                const textColor=isJapanese?'#dc3545':'#007bff'; // Đỏ cho Japanese,Xanh cho Standard
+                const bgColor=isJapanese?'#f8d7da':'#e7f1ff';
+                const cardCount=deck.cards?deck.cards.reduce((sum,c)=>sum+c.quantity,0):0;
+                
+                item.innerHTML=`
+                    <div style="margin-bottom: 10px;">
+                        <h3 style="margin:0 0 10px 0;color:#333;font-size:1.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            ${deck.name||'Unnamed Deck'}
+                        </h3>
+                        <!-- Phần màu sắc đã được nhúng động qua biến textColor và bgColor -->
+                        <span style="font-size:12px;color:${textColor};background:${bgColor};padding:4px 8px;border-radius:12px;font-weight:bold;">
+                            ${symbol}
+                        </span>
+                        <span style="font-size: 12px; color: #666; margin-left: 10px;">
+                            🎴 Cards: ${cardCount}
+                        </span>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-secondary" onclick="copyDeck('${deck.id}')">Copy</button>
+                        <button class="btn-primary" onclick="editDeck('${deck.id}')">Edit</button>
+                        <button class="btn-danger" onclick="deleteDeck('${deck.id}')">Delete</button>
+                        <button class="btn-success" onclick="printFromList('${deck.id}')">Print</button>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
         }
     };
 }
@@ -71,9 +128,14 @@ function editDeck(id){
     const store=db.transaction('decks','readonly').objectStore('decks');
     store.get(id).onsuccess=(e)=>{
         currentDeck=e.target.result;
+        isChanged = false; // Đặt lại trạng thái chưa thay đổi khi tải bộ bài   
         document.getElementById('dashboard').style.display='none';
         document.getElementById('editor').style.display='block';
         document.getElementById('deck-name-input').value = currentDeck.name || "";
+        document.getElementById('deck-name-input').oninput = function(e){
+        currentDeck.name = e.target.value;
+        isChanged = true; // Đánh dấu có thay đổi để hiện cảnh báo khi thoát
+        };
         renderGrid();
     };
 }
@@ -111,24 +173,35 @@ async function handleUpload(event){
         const base64Url=await fileToBase64(file);
         currentDeck.cards.push({url:base64Url,quantity:1});
     }
+    isChanged = true;
     renderGrid();
     event.target.value=''; // Reset input
 }
 
 function renderGrid(){
     const grid=document.getElementById('card-grid');
+    const stats=document.getElementById('deck-stats');
     grid.innerHTML='';
+    
+    let totalCards=0; // Biến lưu tổng số bài
+    
     currentDeck.cards.forEach((card,index)=>{
+        // Cộng dồn số lượng
+        totalCards+=parseInt(card.quantity);
+        
         const div=document.createElement('div');
         div.className='card-item';
         div.innerHTML=`
             <img src="${card.url}">
-            <br>
-            <input type="number" min="1" value="${card.quantity}" onchange="updateQuantity(${index},this.value)">
-            <button onclick="removeCard(${index})" style="color:red;margin-top:10px;cursor:pointer;">REMOVE</button>
+            <div class="quantity-control">
+                <label>No.</label>
+                <input type="number" min="1" value="${card.quantity}" onchange="updateQuantity(${index},this.value)">
+            </div>
+            <button class="btn-danger" onclick="removeCard(${index})" style="width:100%;">🗑️ Remove</button>
         `;
         grid.appendChild(div);
     });
+    stats.textContent = `Total Cards: ${totalCards}`;
 }
 function updateDeckName(val) {
     currentDeck.name = val;
@@ -136,6 +209,8 @@ function updateDeckName(val) {
 
 function updateQuantity(index,val){
     currentDeck.cards[index].quantity=parseInt(val);
+    isChanged = true; // Bật lên lại
+    renderGrid();
 }
 
 function removeCard(index){
@@ -162,6 +237,7 @@ async function saveDeck() {
 
     return new Promise((resolve) => {
         transaction.oncomplete = () => {
+            isChanged = false;
             alert("Successfully saved!");
             resolve(true);
         };
@@ -177,6 +253,7 @@ async function printPDF(){
     const saved=await saveDeck();
     if(!saved) return;
     await generatePDF(currentDeck);
+    isChanged = false;
 }
 
 function printFromList(id){

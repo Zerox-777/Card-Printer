@@ -8,27 +8,50 @@
 </head>
 <body>
     <div id="dashboard">
-        <h1>Deck List</h1>
-        <button onclick="createDeck('J')">Create Deck (Japanese)</button>
-        <button onclick="createDeck('S')">Create Deck (Standard)</button>
+        <h1 class="gradient-title">Deck Collection</h1>
+    
+    <div class="actions" style="text-align:center; margin-bottom:30px;">
+        <button class="btn-primary" onclick="createDeck('J')">➕ Create Deck (Japanese)</button>
+        <button class="btn-primary" onclick="createDeck('S')">➕ Create Deck (Standard)</button>
+    </div>
+    
+    <!-- Vùng chứa danh sách hoặc trạng thái trống -->
+    <div id="deck-list-container">
+        <!-- Trạng thái trống -->
+        <div id="empty-state" style="display:none; text-align:center; padding:40px;">
+            <h3 style="color:#6c757d; margin-bottom:10px;">Your deck collection is empty!</h3>
+            <p style="color:#adb5bd;">Click the buttons above to create your first deck.</p>
+        </div>
+        
+        <!-- Lưới chứa các bộ bài -->
         <div id="deck-list"></div>
+    </div>
     </div>
 
     <div id="editor" style="display:none;">
-        <h1>Deck Editor</h1>
-        <div style="margin-bottom: 20px;">
-             <label for="deck-name-input">Name:</label>
-             <input type="text" id="deck-name-input" placeholder="Enter deck name..." oninput="updateDeckName(this.value)" style="padding: 5px; width: 250px;">
+        <div class="editor-header" style="text-align:center;">
+        <!-- Tận dụng lại class gradient-title của trang chủ -->
+        <h2 class="gradient-title">Deck Editor</h2>
+        <div style="margin-bottom:15px;">
+            <label for="deck-name-input" style="font-weight:bold;">Deck Name: </label>
+            <input type="text" id="deck-name-input" placeholder="Enter deck name..." 
+                   style="padding:8px; width:250px; border-radius:4px; border:1px solid #ccc;">
         </div>
-        <button onclick="goBack()">Return</button>
-        <button onclick="saveDeck()">Save</button>
-        <button onclick="printPDF()">Print</button>
-        <br><br>
-        <input type="file" id="upload" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
-        <button class="btn-success" onclick="triggerUpload()">
-            Upload Images
-        </button>
-        <div id="card-grid" class="grid-container"></div>
+        <p id="deck-stats" style="color:#6c757d;font-size:1.2em;font-weight:bold;margin-bottom:20px;">Total Cards: 0</p>
+    </div>
+
+    <!-- Thanh công cụ sẽ dính chặt trên đầu khi cuộn trang -->
+    <div class="sticky-controls">
+        <button class="btn-secondary" onclick="goBack()">🔙 Back</button>
+        <button class="btn-primary" onclick="document.getElementById('upload-input').click()">📁 Upload Cards</button>
+        <button class="btn-success" onclick="saveDeck()">💾 Save</button>
+        <button class="btn-warning" onclick="printPDF()">🖨️ Print PDF</button>
+    </div>
+
+    <input type="file" id="upload-input" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
+
+    <!-- Đổi id grid để css không bị trùng lặp -->
+    <div id="card-grid" class="editor-grid"></div>
     </div>
 
     <script src="js/script.js"></script>
