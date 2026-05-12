@@ -136,7 +136,7 @@ function editDeck(id){
         isChanged = false; // Đặt lại trạng thái chưa thay đổi khi tải bộ bài   
         const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
         const textColor = currentDeck.size === 'J' ? '#dc3545' : '#007bff';
-        document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;
+        document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;      
         document.getElementById('dashboard').style.display='none';
         document.getElementById('editor').style.display='block';
         document.getElementById('deck-name-input').value = currentDeck.name || "";
@@ -215,7 +215,8 @@ function renderGrid(){
 function updateDeckName(val) {
     currentDeck.name = val;
     const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
-    document.getElementById('deck-type').textContent = `🎴 Deck: ${deckName}`;
+    const textColor = currentDeck.size === 'J' ? '#dc3545' : '#007bff';
+    document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;
 }
 
 function updateQuantity(index,val){
