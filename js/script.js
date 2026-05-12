@@ -20,6 +20,9 @@ request.onsuccess=(e)=>{
 
 // 2.QUẢN LÝ TRANG CHỦ (DASHBOARD)
 function createDeck(size){
+    const deckName = size === 'J' ? 'Japanese' : 'Standard';
+    const textColor = size === 'J' ? '#dc3545' : '#007bff';
+    document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;    
     // 1. Khởi tạo dữ liệu bộ bài mới
     currentDeck={
         id:Date.now().toString(),// Tạo ID duy nhất bằng thời gian
@@ -62,6 +65,8 @@ function goBack(){
     // Nếu không có thay đổi hoặc người dùng đồng ý thoát
     document.getElementById('editor').style.display='none';
     document.getElementById('dashboard').style.display='block';
+    const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
+    document.getElementById('deck-type').textContent = `🎴 Deck: ${deckName}`;
     currentDeck=null;
     isChanged=false;
     if(typeof loadDeckList==='function') loadDeckList();
@@ -129,6 +134,9 @@ function editDeck(id){
     store.get(id).onsuccess=(e)=>{
         currentDeck=e.target.result;
         isChanged = false; // Đặt lại trạng thái chưa thay đổi khi tải bộ bài   
+        const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
+        const textColor = currentDeck.size === 'J' ? '#dc3545' : '#007bff';
+        document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;
         document.getElementById('dashboard').style.display='none';
         document.getElementById('editor').style.display='block';
         document.getElementById('deck-name-input').value = currentDeck.name || "";
@@ -202,9 +210,12 @@ function renderGrid(){
         grid.appendChild(div);
     });
     stats.textContent = `Total Cards: ${totalCards}`;
+    document.getElementById('card-count').textContent = `📊 Cards: ${totalCards}`;
 }
 function updateDeckName(val) {
     currentDeck.name = val;
+    const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
+    document.getElementById('deck-type').textContent = `🎴 Deck: ${deckName}`;
 }
 
 function updateQuantity(index,val){

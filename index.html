@@ -11,8 +11,8 @@
         <h1 class="gradient-title">Deck Collection</h1>
     
     <div class="actions" style="text-align:center; margin-bottom:30px;">
-        <button class="btn-primary" onclick="createDeck('J')">➕ Create Deck (Japanese)</button>
-        <button class="btn-primary" onclick="createDeck('S')">➕ Create Deck (Standard)</button>
+        <button class="btn-primary" onclick="createDeck('J')">➕ Create Deck <span style="color:red;">Japanese</span></button>
+    <button class="btn-primary" onclick="createDeck('S')">➕ Create Deck <span style="color:blue;">Standard</span></button>
     </div>
     
     <!-- Vùng chứa danh sách hoặc trạng thái trống -->
@@ -42,11 +42,23 @@
 
     <!-- Thanh công cụ sẽ dính chặt trên đầu khi cuộn trang -->
     <div class="sticky-controls">
+    <div style="display:flex; align-items:center; gap:20px;">
+        <!-- Bên trái: Tổng số card -->
+        <span id="card-count" style="font-weight:bold; font-size:16px;">📊 Cards: 0</span>
+    </div>
+    
+    <div style="display:flex; gap:10px;">
         <button class="btn-secondary" onclick="goBack()">🔙 Back</button>
         <button class="btn-primary" onclick="document.getElementById('upload-input').click()">📁 Upload Cards</button>
         <button class="btn-success" onclick="saveDeck()">💾 Save</button>
         <button class="btn-warning" onclick="printPDF()">🖨️ Print PDF</button>
     </div>
+    
+    <div style="display:flex; align-items:center; gap:20px;">
+        <!-- Bên phải: Loại deck -->
+        <span id="deck-type" style="font-weight:bold; font-size:16px;">🎴 Deck: -</span>
+    </div>
+</div>
 
     <input type="file" id="upload-input" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
 
