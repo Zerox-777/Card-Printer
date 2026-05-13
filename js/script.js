@@ -118,7 +118,7 @@ function loadDeckList(){
                     </div>
                     <div class="actions">
                         <button class="btn-secondary" onclick="copyDeck('${deck.id}')">Copy</button>
-                        <button class="btn-primary" onclick="editDeck('${deck.id}')">Edit</button>
+                        <button class="btn-changed" onclick="editDeck('${deck.id}')">Edit</button>
                         <button class="btn-danger" onclick="deleteDeck('${deck.id}')">Delete</button>
                         <button class="btn-success" onclick="printFromList('${deck.id}')">Print</button>
                     </div>
