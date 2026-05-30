@@ -2,70 +2,71 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Printer</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <div id="dashboard">
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page">
         <h1 class="gradient-title">Deck Collection</h1>
     
-    <div class="actions" style="text-align:center; margin-bottom:30px;">
-        <button class="btn-primary" onclick="createDeck('J')">➕ Create Deck <span style="color:red;">Japanese</span></button>
-    <button class="btn-primary" onclick="createDeck('S')">➕ Create Deck <span style="color:blue;">Standard</span></button>
-    </div>
-    
-    <!-- Vùng chứa danh sách hoặc trạng thái trống -->
-    <div id="deck-list-container">
-        <!-- Trạng thái trống -->
-        <div id="empty-state" style="display:none; text-align:center; padding:40px;">
-            <h3 style="color:#6c757d; margin-bottom:10px;">Your deck collection is empty!</h3>
-            <p style="color:#adb5bd;">Click the buttons above to create your first deck.</p>
+        <div class="actions" style="text-align:center; margin-bottom:30px;">
+            <button class="btn-primary" onclick="navigateTo('/editor?type=J')">➕ Create Deck <span style="color:red;">Japanese</span></button>
+            <button class="btn-primary" onclick="navigateTo('/editor?type=S')">➕ Create Deck <span style="color:blue;">Standard</span></button>
         </div>
         
-        <!-- Lưới chứa các bộ bài -->
-        <div id="deck-list"></div>
-    </div>
-    </div>
-
-    <div id="editor" style="display:none;">
-        <div class="editor-header" style="text-align:center;">
-        <!-- Tận dụng lại class gradient-title của trang chủ -->
-        <h2 class="gradient-title">Deck Editor</h2>
-        <div style="margin-bottom:15px;">
-            <label for="deck-name-input" style="font-weight:bold;">Deck Name: </label>
-            <input type="text" id="deck-name-input" placeholder="Enter deck name..." 
-                   style="padding:8px; width:250px; border-radius:4px; border:1px solid #ccc;">
+        <!-- Vùng chứa danh sách hoặc trạng thái trống -->
+        <div id="deck-list-container">
+            <!-- Trạng thái trống -->
+            <div id="empty-state" style="display:none; text-align:center; padding:40px;">
+                <h3 style="color:#6c757d; margin-bottom:10px;">Your deck collection is empty!</h3>
+                <p style="color:#adb5bd;">Click the buttons above to create your first deck.</p>
+            </div>
+            
+            <!-- Lưới chứa các bộ bài -->
+            <div id="deck-list"></div>
         </div>
-        <p id="deck-stats" style="color:#6c757d;font-size:1.2em;font-weight:bold;margin-bottom:20px;">Total Cards: 0</p>
     </div>
 
-    <!-- Thanh công cụ sẽ dính chặt trên đầu khi cuộn trang -->
-    <div class="sticky-controls">
-    <div style="display:flex; align-items:center; gap:20px;">
-        <!-- Bên trái: Tổng số card -->
-        <span id="card-count" style="font-weight:bold; font-size:16px;">📊 Cards: 0</span>
-    </div>
-    
-    <div style="display:flex; gap:10px;">
-        <button class="btn-secondary" onclick="goBack()">🔙 Back</button>
-        <button class="btn-primary" onclick="document.getElementById('upload-input').click()">📁 Upload Cards</button>
-        <button class="btn-success" onclick="saveDeck()">💾 Save</button>
-        <button class="btn-warning" onclick="printPDF()">🖨️ Print PDF</button>
-    </div>
-    
-    <div style="display:flex; align-items:center; gap:20px;">
-        <!-- Bên phải: Loại deck -->
-        <span id="deck-type" style="font-weight:bold; font-size:16px;">🎴 Deck: -</span>
-    </div>
-</div>
+    <!-- Editor Page -->
+    <div id="editor" class="page" style="display:none;">
+        <div class="editor-header" style="text-align:center;">
+            <h2 class="gradient-title">Deck Editor</h2>
+            <div style="margin-bottom:15px;">
+                <label for="deck-name-input" style="font-weight:bold;">Deck Name: </label>
+                <input type="text" id="deck-name-input" placeholder="Enter deck name..." 
+                       style="padding:8px; width:250px; border-radius:4px; border:1px solid #ccc;">
+            </div>
+            <p id="deck-stats" style="color:#6c757d;font-size:1.2em;font-weight:bold;margin-bottom:20px;">Total Cards: 0</p>
+        </div>
 
-    <input type="file" id="upload-input" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
+        <!-- Sticky Controls Bar -->
+        <div class="sticky-controls">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <span id="card-count" style="font-weight:bold; font-size:16px;">📊 Cards: 0</span>
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn-secondary" onclick="navigateTo('/dashboard')">🔙 Back</button>
+                <button class="btn-primary" onclick="document.getElementById('upload-input').click()">📁 Upload Cards</button>
+                <button class="btn-success" onclick="saveDeck()">💾 Save</button>
+                <button class="btn-warning" onclick="printPDF()">🖨️ Print PDF</button>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:20px;">
+                <span id="deck-type" style="font-weight:bold; font-size:16px;">🎴 Deck: -</span>
+            </div>
+        </div>
 
-    <!-- Đổi id grid để css không bị trùng lặp -->
-    <div id="card-grid" class="editor-grid"></div>
+        <input type="file" id="upload-input" multiple accept="image/*" onchange="handleUpload(event)" style="display:none;">
+
+        <!-- Card Grid -->
+        <div id="card-grid" class="editor-grid"></div>
     </div>
 
+    <script src="js/router.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

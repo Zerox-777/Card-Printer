@@ -3,7 +3,7 @@ const {jsPDF}=window.jspdf;
 let isChanged=false;
 let currentDeck=null;
 
-// 1.KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB
+// 1. KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB
 const request=indexedDB.open('CardMakerDB',1);
 
 request.onupgradeneeded=(e)=>{
@@ -18,25 +18,29 @@ request.onsuccess=(e)=>{
     loadDeckList();
 };
 
-// 2.QUẢN LÝ TRANG CHỦ (DASHBOARD)
-function createDeck(size){
+// 2. QUẢN LÝ TRANG CHỦ (DASHBOARD)
+
+/**
+ * Tạo bộ bài mới
+ * @param {string} size - 'J' cho Japanese hoặc 'S' cho Standard
+ */
+function createNewDeck(size){
     const deckName = size === 'J' ? 'Japanese' : 'Standard';
     const textColor = size === 'J' ? '#dc3545' : '#007bff';
     document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;    
-    // 1. Khởi tạo dữ liệu bộ bài mới
+    
+    // Khởi tạo dữ liệu bộ bài mới
     currentDeck={
-        id:Date.now().toString(),// Tạo ID duy nhất bằng thời gian
+        id:Date.now().toString(),
         name:"",
-        size:size,// 'J' cho Japanese hoặc 'S' cho Standard
+        size:size,
         cards:[]
     };
-    isChanged=false; // Đặt lại trạng thái chưa thay đổi khi tạo mới
-    document.getElementById('dashboard').style.display='none';
-    document.getElementById('editor').style.display='block';
+    isChanged=false;
+    
     const nameInput=document.getElementById('deck-name-input');
     if(nameInput){
         nameInput.value="";
-        // Gán sự kiện input ngay khi tạo mới
         nameInput.oninput=function(e){
             currentDeck.name=e.target.value;
             isChanged=true;
@@ -46,30 +50,18 @@ function createDeck(size){
     const stats=document.getElementById('deck-stats');
     if(stats) stats.innerText="Total Cards: 0";
 
-    // 5. Vẽ lưới trống
     renderGrid();
 }
 
 function goBack(){
-    if(!currentDeck){
-        document.getElementById('editor').style.display='none';
-        document.getElementById('dashboard').style.display='block';
-        if(typeof loadDeckList==='function') loadDeckList();
-        return;
-    }
     if(isChanged){
         const confirmExit=confirm("You have unsaved changes. Are you sure you want to leave?");
-        if(!confirmExit) return; // Nếu chọn Cancel thì ở lại
+        if(!confirmExit) return;
     }
     
-    // Nếu không có thay đổi hoặc người dùng đồng ý thoát
-    document.getElementById('editor').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
-    document.getElementById('deck-type').textContent = `🎴 Deck: ${deckName}`;
     currentDeck=null;
     isChanged=false;
-    if(typeof loadDeckList==='function') loadDeckList();
+    navigateTo('/dashboard');
 }
 
 function loadDeckList(){
@@ -81,14 +73,12 @@ function loadDeckList(){
         const grid=document.getElementById('deck-list');
         const emptyState=document.getElementById('empty-state');
         
-        grid.innerHTML=''; // Xóa nội dung cũ
+        grid.innerHTML='';
         
         if(decks.length===0){
-            // Nếu chưa có bài thì hiện trạng thái trống
             emptyState.style.display='block';
             grid.style.display='none';
         }else{
-            // Nếu có bài thì ẩn trạng thái trống và hiện lưới
             emptyState.style.display='none';
             grid.style.display='grid';
             
@@ -96,10 +86,9 @@ function loadDeckList(){
                 const item=document.createElement('div');
                 item.className='deck-item';
                 
-                // Hiển thị loại bài cho chuyên nghiệp
                 const isJapanese=deck.size==='J'||deck.type==='J';
                 const symbol=deck.size==='J'?'Japanese':'Standard';
-                const textColor=isJapanese?'#dc3545':'#007bff'; // Đỏ cho Japanese,Xanh cho Standard
+                const textColor=isJapanese?'#dc3545':'#007bff';
                 const bgColor=isJapanese?'#f8d7da':'#e7f1ff';
                 const cardCount=deck.cards?deck.cards.reduce((sum,c)=>sum+c.quantity,0):0;
                 
@@ -108,7 +97,6 @@ function loadDeckList(){
                         <h3 style="margin:0 0 10px 0;color:#333;font-size:1.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                             ${deck.name||'Unnamed Deck'}
                         </h3>
-                        <!-- Phần màu sắc đã được nhúng động qua biến textColor và bgColor -->
                         <span style="font-size:12px;color:${textColor};background:${bgColor};padding:4px 8px;border-radius:12px;font-weight:bold;">
                             ${symbol}
                         </span>
@@ -133,18 +121,18 @@ function editDeck(id){
     const store=db.transaction('decks','readonly').objectStore('decks');
     store.get(id).onsuccess=(e)=>{
         currentDeck=e.target.result;
-        isChanged = false; // Đặt lại trạng thái chưa thay đổi khi tải bộ bài   
+        isChanged = false;
         const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
         const textColor = currentDeck.size === 'J' ? '#dc3545' : '#007bff';
         document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;      
-        document.getElementById('dashboard').style.display='none';
-        document.getElementById('editor').style.display='block';
         document.getElementById('deck-name-input').value = currentDeck.name || "";
         document.getElementById('deck-name-input').oninput = function(e){
-        currentDeck.name = e.target.value;
-        isChanged = true; // Đánh dấu có thay đổi để hiện cảnh báo khi thoát
+            currentDeck.name = e.target.value;
+            isChanged = true;
         };
         renderGrid();
+        const encodedName = encodeURIComponent(currentDeck.name || 'Unnamed Deck');
+        navigateTo(`/editor?id=${id}&name=${encodedName}`);
     };
 }
 
@@ -164,8 +152,7 @@ function deleteDeck(id){
     }
 }
 
-// 3.QUẢN LÝ TRÌNH BIÊN TẬP (EDITOR)
-// Hàm chuyển ảnh thành chuỗi Base64 để lưu trữ vĩnh viễn
+// 3. QUẢN LÝ TRÌNH BIÊN TẬP (EDITOR)
 function fileToBase64(file){
     return new Promise((resolve,reject)=>{
         const reader=new FileReader();
@@ -183,7 +170,7 @@ async function handleUpload(event){
     }
     isChanged = true;
     renderGrid();
-    event.target.value=''; // Reset input
+    event.target.value='';
 }
 
 function renderGrid(){
@@ -191,10 +178,9 @@ function renderGrid(){
     const stats=document.getElementById('deck-stats');
     grid.innerHTML='';
     
-    let totalCards=0; // Biến lưu tổng số bài
+    let totalCards=0;
     
     currentDeck.cards.forEach((card,index)=>{
-        // Cộng dồn số lượng
         totalCards+=parseInt(card.quantity);
         
         const div=document.createElement('div');
@@ -212,16 +198,10 @@ function renderGrid(){
     stats.textContent = `Total Cards: ${totalCards}`;
     document.getElementById('card-count').textContent = `📊 Cards: ${totalCards}`;
 }
-function updateDeckName(val) {
-    currentDeck.name = val;
-    const deckName = currentDeck.size === 'J' ? 'Japanese' : 'Standard';
-    const textColor = currentDeck.size === 'J' ? '#dc3545' : '#007bff';
-    document.getElementById('deck-type').innerHTML = `🎴 Deck: <span style="color:${textColor};">${deckName}</span>`;
-}
 
 function updateQuantity(index,val){
     currentDeck.cards[index].quantity=parseInt(val);
-    isChanged = true; // Bật lên lại
+    isChanged = true;
     renderGrid();
 }
 
@@ -229,13 +209,12 @@ function removeCard(index){
     const confirmRemove = confirm("Are you sure you want to remove this card?");
     if (confirmRemove) {
         currentDeck.cards.splice(index,1);
-        isChanged = true; // Đánh dấu có thay đổi để cảnh báo khi thoát
+        isChanged = true;
         renderGrid();
     }
 }
 
 async function saveDeck() {
-    // Nếu chưa nhập tên ở ô Input thì mới hiện prompt hỏi
     if (!currentDeck.name || currentDeck.name.trim() === "") {
         const deckName = prompt("Enter deck name: ",currentDeck.name || "");
         if (!deckName) return false;
@@ -255,12 +234,8 @@ async function saveDeck() {
         };
     });
 }
-function triggerUpload() {
-    // Khi nhấn nút, nó sẽ giả lập cú click chuột vào ô input file đang bị ẩn
-    document.getElementById('upload').click();
-}
 
-// 4.XỬ LÝ XUẤT FILE PDF
+// 4. XỬ LÝ XUẤT FILE PDF
 async function printPDF(){
     const saved=await saveDeck();
     if(!saved) return;
@@ -313,7 +288,6 @@ async function generatePDF(deck){
             };
         });
 
-        // Sang trang nếu đủ 9 lá và chưa phải lá cuối
         if((i+1)%9===0&&i!==printList.length-1){
             pdf.addPage();
         }
