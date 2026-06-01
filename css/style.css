@@ -13,6 +13,54 @@ body {
 }
  
 /* ============================================
+   THEME VARIABLES
+   ============================================ */
+:root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #fdfdfd;
+    --border: #e0e0e0;
+    --text: #333333;
+    --text-muted: #6c757d;
+    --shadow: rgba(0, 0, 0, 0.05);
+    --sticky-bg: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface-2: #0f3460;
+    --border: #444;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --sticky-bg: rgba(26, 26, 46, 0.95);
+}
+
+#theme-toggle {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    z-index: 9999;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ============================================
    TYPOGRAPHY - Định dạng chữ
    ============================================ */
 .gradient-title {
@@ -35,10 +83,10 @@ body {
     justify-content: center;
     gap: 8px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--sticky-bg);
     backdrop-filter: blur(5px);
     z-index: 100;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
 }
 
 .sticky-controls button {
@@ -52,9 +100,9 @@ body {
     font-size: 17px;
     font-weight: 600;
     border-radius: 6px;
-    border: 1px solid #ddd;
-    background-color: #f8f9fa;
-    color: #333;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--text);
     cursor: pointer;
     box-sizing: border-box;
     transition: all 0.2s ease;
@@ -62,8 +110,8 @@ body {
 }
 
 .sticky-controls button:hover {
-    background-color: #e9ecef;
-    border-color: #007bff;
+    background-color: var(--surface-2);
+    border-color: var(--border);
 }
 /* ============================================
    GRID LAYOUT - Lưới hiển thị
@@ -97,11 +145,12 @@ body {
    CARD & ITEM STYLES - Định dạng thẻ
    ============================================ */
 .card-item {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     padding: 10px;
-    background: #fdfdfd;
+    background: var(--surface);
     border-radius: 8px;
     text-align: center;
+    color: var(--text);
 }
 
 .card-item img {
@@ -112,19 +161,19 @@ body {
 }
 
 .editor-grid .card-item {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 10px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px var(--shadow);
     transition: transform 0.2s ease;
 }
 
 .editor-grid .card-item:hover {
     filter: brightness(0.9);
     transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px var(--shadow);
 }
 
 .editor-grid .card-item img {
@@ -135,12 +184,12 @@ body {
 }
 
 .deck-item {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px var(--shadow);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -148,8 +197,8 @@ body {
 
 .deck-item:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-    border-color: #007bff;
+    box-shadow: 0 12px 20px var(--shadow);
+    border-color: var(--border);
 }
 /* ============================================
    QUANTITY CONTROL - Điều khiển số lượng
@@ -168,8 +217,10 @@ body {
     padding: 5px;
     font-size: 16px;
     text-align: center;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
 }
 /* ============================================
    BUTTONS - Nút bấm
@@ -179,21 +230,21 @@ body {
     width: 100%;
     margin-top: 10px;
     padding: 10px;
-    background-color: #dfdcdc;
-    color: rgb(254, 0, 0);
-    border: none;
+    background-color: transparent;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .card-item button:hover {
-    background-color: #d0cdcd;
+    background-color: rgba(231, 76, 60, 0.1);
 }
 
 .btn-success {
-    background-color: #f9f9f9;
-    border: 2px solid #333 !important;
+    background-color: var(--surface-2);
+    border: 2px solid var(--border) !important;
 }
 
 .deck-item .actions {
@@ -207,8 +258,8 @@ body {
     padding: 12px 5px;
     font-size: 14px;
     margin: 0;
-    background-color: #ffffff;
-    border: 1px solid #333;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -218,16 +269,17 @@ body {
     justify-content: center;
     font-weight: 500;
     box-sizing: border-box;
+    color: var(--text);
 }
 
 /* Print button border dày */
 .deck-item .actions button:nth-child(4) {
-    border: 2px solid #333;
+    border: 2px solid var(--border);
 }
 
 .deck-item .actions button:hover {
-    background-color: #e9ecef;
-    border-color: #007bff;
+    background-color: var(--surface-2);
+    border-color: var(--border);
 }
 
 .actions button {
@@ -242,15 +294,34 @@ body {
     font-size: 18px;
     font-weight: 700;
     border-radius: 8px;
-    border: 2px solid #000000;
-    background-color: #ffffff;
-    color: #333;
+    border: 2px solid var(--border);
+    background-color: var(--surface);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background-color: #ccc5c5;
-    color: rgb(0, 0, 0);
+    background-color: var(--surface-2);
+    color: var(--text);
     transform: scale(1.05);
+}
+
+.deck-item h3 {
+    color: var(--text);
+}
+
+.deck-item span {
+    color: var(--text-muted);
+}
+
+#deck-stats {
+    font-size: 1.3em;
+    font-weight: 800;
+    color: var(--text);
+}
+
+#deck-stats span {
+    color: #007bff;
+    font-size: 1.4em;
 }

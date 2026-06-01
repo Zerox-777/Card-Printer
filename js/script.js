@@ -3,6 +3,25 @@ const {jsPDF}=window.jspdf;
 let isChanged=false;
 let currentDeck=null;
 
+// THEME
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.getElementById('theme-toggle').textContent = isDark ? '🌙' : '☀️';
+}
+
+// Áp dụng theme đã lưu khi tải trang
+(function() {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('theme-toggle');
+        if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+    });
+})();
+
 // 1. KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB
 const request=indexedDB.open('CardMakerDB',1);
 
@@ -48,8 +67,7 @@ function createNewDeck(size){
     }
     
     const stats=document.getElementById('deck-stats');
-    if(stats) stats.innerText="Total Cards: 0";
-
+    stats.innerHTML = `Total Cards: <span>${totalCards}</span>`;
     renderGrid();
 }
 
@@ -94,14 +112,14 @@ function loadDeckList(){
                 
                 item.innerHTML=`
                     <div style="margin-bottom: 10px;">
-                        <h3 style="margin:0 0 10px 0;color:#333;font-size:1.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        <h3 style="margin:0 0 10px 0;font-size:1.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                             ${deck.name||'Unnamed Deck'}
                         </h3>
                         <span style="font-size:12px;color:${textColor};background:${bgColor};padding:4px 8px;border-radius:12px;font-weight:bold;">
                             ${symbol}
                         </span>
-                        <span style="font-size: 12px; color: #666; margin-left: 10px;">
-                            🎴 Cards: ${cardCount}
+                        <span style="font-size: 13px; margin-left: 10px; font-weight: 700; color: var(--text);">
+                            🎴 <span style="color: #007bff;">${cardCount}</span> Cards
                         </span>
                     </div>
                     <div class="actions">
@@ -195,8 +213,8 @@ function renderGrid(){
         `;
         grid.appendChild(div);
     });
-    stats.textContent = `Total Cards: ${totalCards}`;
-    document.getElementById('card-count').textContent = `📊 Cards: ${totalCards}`;
+    stats.innerHTML = `Total Cards: <span>${totalCards}</span>`;
+    document.getElementById('card-count').innerHTML = `📊 Cards: <span>${totalCards}</span>`;
 }
 
 function updateQuantity(index,val){
